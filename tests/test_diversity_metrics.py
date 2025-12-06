@@ -282,8 +282,6 @@ class TestDiversityMetrics:
         assert score_high_lexical >= score_low_lexical
 
 
-
-
 class TestDiversityMetricsEdgeCases:
     """Test edge cases and error handling."""
 

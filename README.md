@@ -1,6 +1,6 @@
 # NLPBench - Dataset Quality Measurement Tool
 
-A comprehensive tool for analyzing the quality of NLP datasets using Great Expectations and advanced diversity metrics. NLPBench provides detailed quality assessments, diversity measurements, beautiful reports, and actionable recommendations for improving your datasets.
+A comprehensive tool for analyzing the quality of tabluar datasets using multiple metrics. NLPBench provides detailed quality assessments, diversity measurements, reports, and actionable recommendations for improving your dataset quality.
 
 ![Terminal Screenshot of NLPBench Results](https://raw.githubusercontent.com/lukehinds/NLPBench/refs/heads/main/assets/screenie.png)
 
@@ -10,7 +10,6 @@ A comprehensive tool for analyzing the quality of NLP datasets using Great Expec
 - **Advanced Diversity Metrics**: Measures lexical, semantic, syntactic, and topic diversity with tiered analysis
 - **Great Expectations Integration**: Robust data validation framework with custom NLP expectations
 - **Multiple Dataset Formats**: Supports conversations, instruction-following, Q&A, and other common formats
-- **Rich Console Output**: Beautiful CLI interface with progress bars and colored output
 - **Multiple Report Formats**: Generate reports in console, JSON, or HTML format
 - **Configurable Validation Rules**: Customize quality thresholds and validation parameters
 - **Hugging Face Integration**: Direct integration with the Hugging Face Hub
@@ -98,6 +97,7 @@ nlpbench analyze --hf-repo REPO_ID [OPTIONS]
 - `--output-file`: Output file path
 - `--cache-dir`: Cache directory for datasets
 - `--token`: Hugging Face authentication token
+- `--exclude-system-role`: Exclude entries with 'system' role from analysis
 
 ### Inspect Command
 
@@ -106,6 +106,15 @@ Quickly inspect a dataset without running full analysis:
 ```bash
 nlpbench inspect --hf-repo REPO_ID [OPTIONS]
 ```
+
+**Options:**
+- `--hf-repo`: Hugging Face dataset repository
+- `--config-name`: Dataset configuration name
+- `--split`: Dataset split to inspect (default: train)
+- `--samples`: Number of samples to show (default: 5)
+- `--cache-dir`: Cache directory for datasets
+- `--token`: Hugging Face authentication token
+- `--exclude-system-role`: Exclude entries with 'system' role from inspection
 
 ### Configuration Commands
 
@@ -210,18 +219,6 @@ NLPBench evaluates datasets across multiple dimensions:
 - Quality level classification
 - Actionable recommendations for improvement
 
-## Requirements
-
-### Core Dependencies
-- Python 3.8+
-- datasets >= 2.14.0
-- great-expectations >= 0.18.0
-- pydantic >= 2.0.0
-- click >= 8.0.0
-- rich >= 13.0.0
-- tqdm >= 4.65.0
-- pandas >= 2.0.0
-- numpy >= 1.21.0
 
 ### Optional Dependencies (for Enhanced Diversity Metrics)
 - sentence-transformers >= 2.2.0 (semantic analysis)
@@ -247,14 +244,8 @@ make dev-setup
 
 ### Running Tests
 
-```bash
-# Using uv
-uv run pytest
-
-# With coverage
-uv run pytest --cov=src --cov-report=html
-
 # Using make
+```bash
 make test
 make test-cov
 ```
@@ -263,49 +254,20 @@ make test-cov
 
 ```bash
 # Linting
-uv run ruff check .
 make lint
 
 # Auto-fix linting issues
-uv run ruff check --fix .
 make lint-fix
 
 # Formatting
-uv run ruff format .
 make format
 
 # Type checking
-uv run mypy src/
 make type-check
 
 # Run all checks
 make check
 ```
-
-### Available Make Commands
-
-```bash
-make help              # Show available commands
-make install           # Install dependencies
-make install-dev       # Install with dev dependencies
-make test             # Run tests
-make test-cov         # Run tests with coverage
-make lint             # Run linting
-make format           # Format code
-make check            # Run all quality checks
-make clean            # Clean temporary files
-make build            # Build the package
-make demo             # Run demo analysis
-make demo-html        # Generate HTML demo report
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Run the test suite
-5. Submit a pull request
 
 ## License
 
