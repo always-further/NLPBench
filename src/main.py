@@ -54,6 +54,11 @@ console = Console()
 @click.option("--kaggle-path", type=str, help="Specific file path within Kaggle dataset")
 @click.option("--force-download", is_flag=True, help="Force re-download Kaggle dataset")
 @click.option("--quiet", is_flag=True, help="Suppress warning messages for cleaner output")
+@click.option(
+    "--exclude-system-role",
+    is_flag=True,
+    help="Exclude entries with 'system' role from analysis",
+)
 @click.pass_context
 def cli(
     ctx,
@@ -70,6 +75,7 @@ def cli(
     kaggle_path,
     force_download,
     quiet,
+    exclude_system_role,
 ):
     """
     NLPBench - Dataset Quality Measurement Tool
@@ -111,6 +117,7 @@ def cli(
             kaggle_path=kaggle_path,
             force_download=force_download,
             quiet=quiet,
+            exclude_system_role=exclude_system_role,
         )
 
 
@@ -133,6 +140,11 @@ def cli(
 @click.option("--kaggle-path", type=str, help="Specific file path within Kaggle dataset")
 @click.option("--force-download", is_flag=True, help="Force re-download Kaggle dataset")
 @click.option("--quiet", is_flag=True, help="Suppress warning messages for cleaner output")
+@click.option(
+    "--exclude-system-role",
+    is_flag=True,
+    help="Exclude entries with 'system' role from analysis",
+)
 def analyze(
     hf_repo,
     kaggle_dataset,
@@ -147,6 +159,7 @@ def analyze(
     kaggle_path,
     force_download,
     quiet,
+    exclude_system_role,
 ):
     """Analyze a dataset (HuggingFace or Kaggle) for quality issues."""
 
@@ -217,6 +230,16 @@ def analyze(
         # Convert to DataFrame for quality checking
         df = loader.to_dataframe()
         console.print(f"[green]Dataset loaded successfully: {len(df)} entries[/green]")
+
+        # Filter out system role entries if requested
+        if exclude_system_role:
+            original_count = len(df)
+            df = df[df["role"] != "system"]
+            filtered_count = original_count - len(df)
+            if filtered_count > 0:
+                console.print(
+                    f"[yellow]Excluded {filtered_count} entries with 'system' role[/yellow]"
+                )
 
         # Display sample data
         sample_data = loader.get_sample_data(3)
@@ -346,6 +369,11 @@ def show_config(config_format):
 @click.option("--kaggle-version", type=str, help="Kaggle dataset version")
 @click.option("--kaggle-path", type=str, help="Specific file path within Kaggle dataset")
 @click.option("--force-download", is_flag=True, help="Force re-download Kaggle dataset")
+@click.option(
+    "--exclude-system-role",
+    is_flag=True,
+    help="Exclude entries with 'system' role from inspection",
+)
 def inspect(
     hf_repo,
     kaggle_dataset,
@@ -357,6 +385,7 @@ def inspect(
     kaggle_version,
     kaggle_path,
     force_download,
+    exclude_system_role,
 ):
     """Inspect a dataset without running full quality analysis."""
 
@@ -425,12 +454,20 @@ def inspect(
 
         # Show role distribution
         if "role_distribution" in info:
+            role_dist = info["role_distribution"]
+            if exclude_system_role and "system" in role_dist:
+                excluded_count = role_dist.pop("system")
+                console.print(
+                    f"[yellow]Excluding {excluded_count} entries with 'system' role[/yellow]"
+                )
             console.print("\n[green]Role Distribution:[/green]")
-            for role, count in info["role_distribution"].items():
+            for role, count in role_dist.items():
                 console.print(f"  {role}: {count:,}")
 
         # Show sample data
-        sample_data = loader.get_sample_data(samples)
+        sample_data = loader.get_sample_data(samples * 2 if exclude_system_role else samples)
+        if exclude_system_role:
+            sample_data = [s for s in sample_data if s["role"] != "system"][:samples]
         if sample_data:
             console.print(f"\n[green]Sample entries (showing {len(sample_data)}):[/green]")
             for i, sample in enumerate(sample_data, 1):
