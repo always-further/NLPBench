@@ -52,7 +52,7 @@ dev = [
 ]
 diversity = [
     "sentence-transformers>=2.2.0",
-    "torch>=2.0.0",
+    "torch>=2.8.0",
     "scikit-learn>=1.3.0",
     "nltk>=3.8.0",
     "textstat>=0.7.0",
