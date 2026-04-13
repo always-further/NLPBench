@@ -58,7 +58,7 @@ diversity = [
     "textstat>=0.7.0",
     "spacy>=3.6.0",
     "gensim>=4.3.0",
-    "umap-learn>=0.5.0",
+    "umap-learn>=0.5.12",
 ]
 all = [
     "nlpbench[diversity]",
